@@ -1,0 +1,22 @@
+openhabian_admin_group: openhab
+openhabian_mysql_openhab_user: openhab
+openhabian_mysql_openhab_password: ""
+openhabian_mysql_openhab_db: "OpenHAB"
+openhabian_openhab_prowl_apikey: ""
+openhabian_addons_package: "expert"
+openhabian_addons_binding:
+- exec
+openhabian_addons_ui:
+- paper
+openhabian_addons_persistence:
+- mapdb
+openhabian_addons_action:
+- ""
+openhabian_logging_block: "{{ lookup('file', 'org.ops4j.pax.logging.cfg.j2') }}"
+openhabian_configfiles:
+- { file: 'mapdb.persist', folder: 'persistence'}
+- { file: 'mysql.persist', folder: 'persistence'}
+- { file: 'mapdb.cfg', folder: 'services'}
+- { file: 'mysql.cfg', folder: 'services'}
+- { file: 'prowl.cfg', folder: 'services'}
+- { file: 'weather.cfg', folder: 'services'}

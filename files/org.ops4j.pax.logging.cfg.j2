@@ -1,0 +1,25 @@
+
+# Define Zwave file appender
+log4j2.appender.zwave.type = RollingRandomAccessFile
+log4j2.appender.zwave.name = ZWAVE
+log4j2.appender.zwave.fileName = ${openhab.logdir}/zwave.log
+log4j2.appender.zwave.filePattern = ${openhab.logdir}/zwave.log.%i
+log4j2.appender.zwave.append = true
+log4j2.appender.zwave.layout.type = PatternLayout
+log4j2.appender.zwave.layout.pattern = %d{yyyy-MM-dd HH:mm:ss.SSS} [%-5.5p] [%-36.36c] - %m%n
+log4j2.appender.zwave.policies.type = Policies
+log4j2.appender.zwave.policies.size.type = SizeBasedTriggeringPolicy
+log4j2.appender.zwave.policies.size.size = 100MB
+
+# Configure Zwave logging
+log4j2.logger.org_openhab_binding_zwave.level = DEBUG
+log4j2.logger.org_openhab_binding_zwave.name = org.openhab.binding.zwave
+log4j2.logger.org_openhab_binding_zwave.additivity = false
+log4j2.logger.org_openhab_binding_zwave.appenderRefs = zwave
+log4j2.logger.org_openhab_binding_zwave.appenderRef.zwave.ref = ZWAVE
+
+# Configure persistence logging levels
+log4j2.logger.org_openhab_core_persistence_persistenceservice.level = DEBUG
+log4j2.logger.org_openhab_core_persistence_persistenceservice.name = org.openhab.core.persistence.PersistenceService
+
+# log:set commands via OSGi console will end up here:
