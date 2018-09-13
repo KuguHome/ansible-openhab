@@ -39,3 +39,4 @@
     dest: "/etc/openhab2/{{item.folder}}/{{item.file}}"
     owner: openhab
     group: "{{ openhabian_admin_group }}"
+  become: yes
