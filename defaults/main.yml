@@ -1,3 +1,10 @@
+openhab_installation_mode: openhabian
+openhab_version: 2.3.0
+openhab_snapshot_version: 20180527.171156-145
+openhab_stable_address: "https://bintray.com/openhab/mvn/download_file?file_path=org%2Fopenhab%2Fdistro%2Fopenhab%2F{{openhab_version}}%2Fopenhab-{{openhab_version}}.zip"
+# this doesn't work yet
+openhab_snapshot_address: "https://openhab.jfrog.io/openhab/libs-snapshot-local/org/openhab/distro/openhab/{{openhab_version}}-SNAPSHOT/openhab-{{openhab_version}}-{{openhab_snapshot_version}}.tar.gz"
+
 openhabian_admin_group: openhab
 openhabian_mysql_openhab_user: openhab
 openhabian_mysql_openhab_password: ""

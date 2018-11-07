@@ -1,0 +1,10 @@
+- name: Reload systemd daemon
+  become: true
+  systemd:
+    daemon_reload: yes
+
+- name: Restart openhab
+  become: true
+  systemd:
+    name: openhab2
+    state: restarted

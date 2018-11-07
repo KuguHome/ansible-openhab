@@ -1,0 +1,7 @@
+openhab_path_application: "/usr/share/openhab2"
+openhab_path_addons: "{{openhab_path_application}}/addons"
+openhab_path_conf: "/etc/openhab2"
+openhab_path_log: "/var/log/openhab2"
+openhab_path_userdata: "/var/lib/openhab2"
+openhab_path_backups: "{{openhab_path_userdata}}/backups"
+openhab_path_service: "/etc/default/openhab2"

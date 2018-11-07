@@ -1,0 +1,7 @@
+openhab_path_application: "/opt/openhab2"
+openhab_path_addons: "{{openhab_path_application}}/addons"
+openhab_path_conf: "{{openhab_path_application}}/conf"
+openhab_path_log: "{{openhab_path_userdata}}/logs"
+openhab_path_userdata: "{{openhab_path_application}}/userdata"
+openhab_path_backups: "{{openhab_path_application}}/backups"
+openhab_path_service: ""
