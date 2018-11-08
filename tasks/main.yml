@@ -1,4 +1,5 @@
 - name: set variables depending on installation mode
+  tags: always
   include_vars: "{{openhab_installation_mode}}.yml"
 
 - name: Create user
