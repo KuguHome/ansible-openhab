@@ -4,6 +4,7 @@
 
 - name: Create user
   when: openhab_installation_mode == "manual"
+  become: True
   user:
     name: "openhab"
     system: yes
@@ -63,6 +64,7 @@
     line: "{{ item.property }} = {{ item.value }}"
     backrefs: yes # to only change if regexp matches
 - name: add log level configuration for certain packages
+  tags: logging
   blockinfile:
     path: "{{openhab_path_userdata}}/etc/org.ops4j.pax.logging.cfg"
     insertafter: "log4j2\\.appender\\.osgi\\.filter = \\*"
