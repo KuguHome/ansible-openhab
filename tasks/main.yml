@@ -9,7 +9,7 @@
     name: "openhab"
     system: yes
     create_home: no
-    password_lock: yes
+#    password_lock: yes # will always "change"
 
 - name: unpack archive
   when: openhab_installation_mode == "manual"
@@ -20,6 +20,8 @@
     owner: openhab
     group: openhab
     remote_src: yes
+    creates: "{{openhab_path_application}}/runtime"
+    keep_newer: yes
 
 - name: setup openhab as a systemd service
   when: openhab_installation_mode == "manual"
