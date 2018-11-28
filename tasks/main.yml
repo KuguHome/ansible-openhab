@@ -49,9 +49,6 @@
     recurse: yes
 
 - name: Configure settings in .cfg files
-  tags: 
-  - configure
-  - openhab
   with_items:
     - { file: '{{openhab_path_conf}}/services/addons.cfg', property: 'package', value: "{{openhabian_addons_package}}" }
     - { file: '{{openhab_path_conf}}/services/addons.cfg', property: 'binding', value: "{{openhabian_addons_binding | join(',')}}" }
