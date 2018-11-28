@@ -6,9 +6,9 @@ openhab_stable_address: "https://bintray.com/openhab/mvn/download_file?file_path
 openhab_snapshot_address: "https://openhab.jfrog.io/openhab/libs-snapshot-local/org/openhab/distro/openhab/{{openhab_version}}-SNAPSHOT/openhab-{{openhab_version}}-{{openhab_snapshot_version}}.tar.gz"
 
 openhabian_admin_group: openhab
-openhabian_mysql_openhab_user: openhab
-openhabian_mysql_openhab_password: ""
-openhabian_mysql_openhab_db: "OpenHAB"
+openhabian_persist_openhab_user: openhab
+openhabian_persist_openhab_password: ""
+openhabian_persist_openhab_db: "OpenHAB"
 openhabian_openhab_prowl_apikey: ""
 openhabian_addons_package: "expert"
 openhabian_addons_binding:
