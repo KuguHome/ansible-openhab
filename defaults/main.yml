@@ -27,3 +27,7 @@ openhabian_configfiles:
 - { file: 'mysql.cfg', folder: 'services'}
 - { file: 'prowl.cfg', folder: 'services'}
 - { file: 'weather.cfg', folder: 'services'}
+openhabian_default_port_http: "8080"
+openhabian_default_port_https: "8443"
+openhabian_port_http: "{{openhabian_default_port_http}}"
+openhabian_port_https: "{{openhabian_default_port_https}}"

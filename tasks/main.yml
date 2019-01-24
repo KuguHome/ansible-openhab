@@ -36,6 +36,22 @@
   - Reload systemd daemon
   - Restart openhab
 
+- name: configure http ports
+  become: true
+  tags: test
+  when: openhabian_port_http != openhabian_default_port_http or openhabian_port_https != openhabian_default_port_https
+  with_items:
+    - { property: 'OPENHAB_HTTP_PORT', value: "{{openhabian_port_http}}" }
+    - { property: 'OPENHAB_HTTPS_PORT', value: "{{openhabian_port_https}}" }
+  lineinfile:
+    dest: "{{openhab_path_environment}}"
+    regexp: "{{ item.property | regex_escape() }}"
+    line: "{{ item.property }}={{ item.value }}"
+    backrefs: yes # to only change if regexp matches
+  notify:
+  - Reload systemd daemon
+  - Restart openhab
+
 - name: set permissions for openhab config dirs
   become: true
   with_items:

@@ -12,7 +12,7 @@ After=network-online.target
 #Environment=OPENHAB_USERDATA=/var/lib/openhab2
 #Environment=OPENHAB_LOGDIR=/var/log/openhab2
 #Environment=OPENHAB_STARTMODE=daemon
-#EnvironmentFile=-/etc/default/openhab2
+#EnvironmentFile={{openhab_path_environment}}
 
 User=openhab
 Group=openhab
