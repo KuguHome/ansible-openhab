@@ -6,26 +6,24 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
-#Environment=OPENHAB_HOME=/usr/share/openhab2
-#Environment=OPENHAB_CONF=/etc/openhab2
-#Environment=OPENHAB_RUNTIME=/usr/share/openhab2/runtime
-#Environment=OPENHAB_USERDATA=/var/lib/openhab2
-#Environment=OPENHAB_LOGDIR=/var/log/openhab2
+#Environment=OPENHAB_HOME={{ openhab_path_application }}
+#Environment=OPENHAB_CONF={{ openhab_path_conf }}
+#Environment=OPENHAB_RUNTIME={{ openhab_path_application }}/runtime
+#Environment=OPENHAB_USERDATA={{ openhab_path_userdata }}
+#Environment=OPENHAB_LOGDIR={{ openhab_path_log }}
 #Environment=OPENHAB_STARTMODE=daemon
-#EnvironmentFile={{openhab_path_environment}}
+#EnvironmentFile={{ openhab_path_environment }}
 
-User=openhab
-Group=openhab
+User={{openhabian_user}}
+Group={{openhabian_group}}
 
 GuessMainPID=yes
 WorkingDirectory={{ openhab_path_application }}
-#WorkingDirectory=/usr/share/openhab2
-#EnvironmentFile=/etc/default/openhab2
 ExecStart={{ openhab_path_application }}/start.sh server
 ExecStop=/bin/kill -SIGINT $MAINPID
 
-#ExecStart=/usr/share/openhab2/runtime/bin/karaf $OPENHAB_STARTMODE
-#ExecStop=/usr/share/openhab2/runtime/bin/karaf stop
+#ExecStart={{ openhab_path_application }}/runtime/bin/karaf $OPENHAB_STARTMODE
+#ExecStop={{ openhab_path_application }}/runtime/bin/karaf stop
 
 SuccessExitStatus=0 143
 RestartSec=5

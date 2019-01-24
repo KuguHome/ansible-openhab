@@ -3,35 +3,35 @@
   include_vars: "{{openhab_installation_mode}}.yml"
 
 - name: Create user
-  when: openhab_installation_mode == "manual"
+  when: openhab_installation_mode == "archive"
   become: True
   user:
-    name: "openhab"
+    name: "{{openhabian_user}}"
     system: yes
     create_home: no
 #    password_lock: yes # will always "change"
 
 - name: unpack archive
-  when: openhab_installation_mode == "manual"
+  when: openhab_installation_mode == "archive"
   become: True
   unarchive:
     src: "{{openhab_stable_address}}"
     dest: "{{openhab_path_application}}"
-    owner: openhab
-    group: openhab
+    owner: "{{openhabian_user}}"
+    group: "{{openhabian_group}}"
     remote_src: yes
     creates: "{{openhab_path_application}}/runtime"
     keep_newer: yes
 
 - name: setup openhab as a systemd service
-  when: openhab_installation_mode == "manual"
+  when: openhab_installation_mode == "archive"
   tags: test
   become: true
   template:
     src: "openhab2.service.j2"
     dest: "/lib/systemd/system/openhab2.service"
-#    owner: openhab
-#    group: openhab
+#    owner: "{{openhabian_user}}"
+#    group: "{{openhabian_group}}"
   notify:
   - Reload systemd daemon
   - Restart openhab
@@ -59,7 +59,7 @@
     - "{{openhab_path_userdata}}/etc/"
   file:
     path: "{{item}}"
-    owner: openhab
+    owner: "{{openhabian_user}}"
     group: "{{ openhabian_admin_group }}"
     mode: "u+rw,g+rw,o=r"
     recurse: yes
@@ -92,6 +92,6 @@
   template:
     src: "{{item.srcpath | default('')}}{{item.file}}.j2"
     dest: "{{openhab_path_conf}}/{{item.folder}}/{{item.file}}"
-    owner: openhab
+    owner: "{{openhabian_user}}"
     group: "{{ openhabian_admin_group }}"
   become: yes
