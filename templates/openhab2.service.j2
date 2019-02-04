@@ -12,7 +12,7 @@ After=network-online.target
 #Environment=OPENHAB_USERDATA={{ openhab_path_userdata }}
 #Environment=OPENHAB_LOGDIR={{ openhab_path_log }}
 #Environment=OPENHAB_STARTMODE=daemon
-#EnvironmentFile={{ openhab_path_environment }}
+EnvironmentFile={{ openhab_path_environment }}
 
 User={{openhabian_user}}
 Group={{openhabian_group}}
