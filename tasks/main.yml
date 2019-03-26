@@ -1,6 +1,6 @@
 - name: set variables depending on installation mode
   tags: always
-  include_vars: "{{openhab_installation_mode}}.yml"
+  include_vars: "{{ openhab_installation_mode }}.yml"
 
 - name: Add Azul key
   when: openhabian_install_java
@@ -26,7 +26,7 @@
   when: openhab_installation_mode == "archive"
   become: True
   user:
-    name: "{{openhabian_user}}"
+    name: "{{ openhabian_user }}"
     system: yes
     create_home: no
 #    password_lock: yes # will always "change"
@@ -36,20 +36,20 @@
   become: True
   file:
     state: directory
-    dest: "{{openhab_path_application}}"
-    owner: "{{openhabian_user}}"
-    group: "{{openhabian_group}}"
+    dest: "{{ openhab_path_application }}"
+    owner: "{{ openhabian_user }}"
+    group: "{{ openhabian_group }}"
 
 - name: unpack archive
   when: openhab_installation_mode == "archive"
   become: True
   unarchive:
-    src: "{{openhab_stable_address}}"
-    dest: "{{openhab_path_application}}"
-    owner: "{{openhabian_user}}"
-    group: "{{openhabian_group}}"
+    src: "{{ openhab_stable_address }}"
+    dest: "{{ openhab_path_application }}"
+    owner: "{{ openhabian_user }}"
+    group: "{{ openhabian_group }}"
     remote_src: yes
-    creates: "{{openhab_path_application}}/runtime"
+    creates: "{{ openhab_path_application }}/runtime"
     keep_newer: yes
 
 - name: deploy systemd environment
@@ -58,9 +58,9 @@
   become: true
   template:
     src: "environment.j2"
-    dest: "{{openhab_path_environment}}"
-#    owner: "{{openhabian_user}}"
-#    group: "{{openhabian_group}}"
+    dest: "{{ openhab_path_environment }}"
+#    owner: "{{ openhabian_user }}"
+#    group: "{{ openhabian_group }}"
   notify:
   - Reload systemd daemon
   - Restart openhab
@@ -72,8 +72,8 @@
   template:
     src: "openhab2.service.j2"
     dest: "/lib/systemd/system/openhab2.service"
-#    owner: "{{openhabian_user}}"
-#    group: "{{openhabian_group}}"
+#    owner: "{{ openhabian_user }}"
+#    group: "{{ openhabian_group }}"
   notify:
   - Reload systemd daemon
   - Restart openhab
@@ -83,10 +83,10 @@
   tags: test
   when: openhabian_port_http != openhabian_default_port_http or openhabian_port_https != openhabian_default_port_https
   with_items:
-    - { property: 'OPENHAB_HTTP_PORT', value: "{{openhabian_port_http}}" }
-    - { property: 'OPENHAB_HTTPS_PORT', value: "{{openhabian_port_https}}" }
+    - { property: 'OPENHAB_HTTP_PORT', value: "{{ openhabian_port_http }}" }
+    - { property: 'OPENHAB_HTTPS_PORT', value: "{{ openhabian_port_https }}" }
   lineinfile:
-    dest: "{{openhab_path_environment}}"
+    dest: "{{ openhab_path_environment }}"
     regexp: "{{ item.property | regex_escape() }}"
     line: "{{ item.property }}={{ item.value }}"
     backrefs: yes # to only change if regexp matches
@@ -97,27 +97,27 @@
 - name: set permissions for openhab config dirs
   become: true
   with_items:
-    - "{{openhab_path_conf}}/"
-    - "{{openhab_path_userdata}}/etc/"
+    - "{{ openhab_path_conf }}/"
+    - "{{ openhab_path_userdata }}/etc/"
   file:
-    path: "{{item}}"
-    owner: "{{openhabian_user}}"
+    path: "{{ item }}"
+    owner: "{{ openhabian_user }}"
     group: "{{ openhabian_admin_group }}"
     mode: "u+rw,g+rw,o=r"
     recurse: yes
 
 - name: Configure settings in .cfg files
   with_items:
-    - { file: '{{openhab_path_conf}}/services/addons.cfg', property: 'package', value: "{{openhabian_addons_package}}" }
-    - { file: '{{openhab_path_conf}}/services/addons.cfg', property: 'binding', value: "{{openhabian_addons_binding | join(',')}}" }
-    - { file: '{{openhab_path_conf}}/services/addons.cfg', property: 'ui', value: "{{openhabian_addons_ui | join(',')}}" }
-    - { file: '{{openhab_path_conf}}/services/addons.cfg', property: 'persistence', value: "{{openhabian_addons_persistence | join(',')}}" }
-    - { file: '{{openhab_path_conf}}/services/addons.cfg', property: 'action', value: "{{openhabian_addons_action | join(',')}}" }
-    - { file: '{{openhab_path_conf}}/services/runtime.cfg', property: 'org.eclipse.smarthome.core.localeprovider:language', value: 'de' }
-    - { file: '{{openhab_path_conf}}/services/runtime.cfg', property: 'org.eclipse.smarthome.core.localeprovider:region', value: 'DE' }
-    - { file: '{{openhab_path_conf}}/services/runtime.cfg', property: 'org.eclipse.smarthome.persistence:default', value: 'mapdb' }
-    - { file: '{{openhab_path_userdata}}/etc/org.ops4j.pax.logging.cfg', property: 'log4j2.appender.out.policies.size.size', value: '100MB' }
-    - { file: '{{openhab_path_userdata}}/etc/org.ops4j.pax.logging.cfg', property: 'log4j2.appender.event.policies.size.size', value: '100MB' }
+    - { file: '{{ openhab_path_conf }}/services/addons.cfg', property: 'package', value: "{{ openhabian_addons_package }}" }
+    - { file: '{{ openhab_path_conf }}/services/addons.cfg', property: 'binding', value: "{{ openhabian_addons_binding | join(',') }}" }
+    - { file: '{{ openhab_path_conf }}/services/addons.cfg', property: 'ui', value: "{{ openhabian_addons_ui | join(',') }}" }
+    - { file: '{{ openhab_path_conf }}/services/addons.cfg', property: 'persistence', value: "{{ openhabian_addons_persistence | join(',') }}" }
+    - { file: '{{ openhab_path_conf }}/services/addons.cfg', property: 'action', value: "{{ openhabian_addons_action | join(',') }}" }
+    - { file: '{{ openhab_path_conf }}/services/runtime.cfg', property: 'org.eclipse.smarthome.core.localeprovider:language', value: 'de' }
+    - { file: '{{ openhab_path_conf }}/services/runtime.cfg', property: 'org.eclipse.smarthome.core.localeprovider:region', value: 'DE' }
+    - { file: '{{ openhab_path_conf }}/services/runtime.cfg', property: 'org.eclipse.smarthome.persistence:default', value: 'mapdb' }
+    - { file: '{{ openhab_path_userdata }}/etc/org.ops4j.pax.logging.cfg', property: 'log4j2.appender.out.policies.size.size', value: '100MB' }
+    - { file: '{{ openhab_path_userdata }}/etc/org.ops4j.pax.logging.cfg', property: 'log4j2.appender.event.policies.size.size', value: '100MB' }
   lineinfile:
     dest: "{{ item.file }}"
     regexp: "{{ item.property | regex_escape() }}"
@@ -126,14 +126,14 @@
 - name: add log level configuration for certain packages
   tags: logging
   blockinfile:
-    path: "{{openhab_path_userdata}}/etc/org.ops4j.pax.logging.cfg"
+    path: "{{ openhab_path_userdata }}/etc/org.ops4j.pax.logging.cfg"
     insertafter: "log4j2\\.appender\\.osgi\\.filter = \\*"
     block: "{{ openhabian_logging_block }}"
 - name: deploy persistence configuration
   with_items: "{{ openhabian_configfiles }}"
   template:
-    src: "{{item.srcpath | default('')}}{{item.file}}.j2"
-    dest: "{{openhab_path_conf}}/{{item.folder}}/{{item.file}}"
-    owner: "{{openhabian_user}}"
+    src: "{{ item.srcpath | default('') }}{{ item.file }}.j2"
+    dest: "{{ openhab_path_conf }}/{{ item.folder }}/{{ item.file }}"
+    owner: "{{ openhabian_user }}"
     group: "{{ openhabian_admin_group }}"
   become: yes
