@@ -8,9 +8,9 @@ openhab_snapshot_address: "https://openhab.jfrog.io/openhab/libs-snapshot-local/
 openhabian_user: "openhab"
 openhabian_group: "openhab"
 openhabian_admin_group: "{{openhabian_group}}"
-openhabian_persist_openhab_user: "openhab"
-openhabian_persist_openhab_password: ""
-openhabian_persist_openhab_db: "OpenHAB"
+openhabian_persistence_user: "openhab"
+openhabian_persistence_password: ""
+openhabian_persistence_db: "OpenHAB"
 openhabian_openhab_prowl_apikey: ""
 openhabian_addons_package: "expert"
 openhabian_addons_binding:
@@ -35,3 +35,5 @@ openhabian_port_http: "{{openhabian_default_port_http}}"
 openhabian_port_https: "{{openhabian_default_port_https}}"
 
 openhabian_install_java: false
+openhabian_consoleloginkey: id_rsa_openhabconsole
+openhabian_refresh_consoleloginkey: yes
