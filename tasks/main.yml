@@ -136,4 +136,19 @@
     dest: "{{ openhab_path_conf }}/{{ item.folder }}/{{ item.file }}"
     owner: "{{ openhabian_user }}"
     group: "{{ openhabian_admin_group }}"
+    mode: "u+rw,g+rw,o=r"
   become: yes
+
+- name: deploy additional addons from local machine
+  when: openhab_additional_addons_local is defined
+  with_items: "{{ openhab_additional_addons_local }}"
+  copy:
+    src: "{{ item }}"
+    dest: "{{ openhab_path_addons }}/"
+
+- name: Deploy additional addons from remote URLs
+  when: openhab_additional_addons_url is defined
+  with_items: "{{ openhab_additional_addons_url }}"
+  get_url:
+    url: "{{ item }}"
+    dest: "{{ openhab_path_addons }}/"
