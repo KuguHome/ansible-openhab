@@ -54,7 +54,6 @@
 
 - name: deploy systemd environment
   when: openhab_installation_mode == "archive"
-  tags: test
   become: true
   template:
     src: "environment.j2"
@@ -67,7 +66,6 @@
 
 - name: setup openhab as a systemd service
   when: openhab_installation_mode == "archive"
-  tags: test
   become: true
   template:
     src: "openhab2.service.j2"
@@ -80,11 +78,10 @@
 
 - name: configure http ports
   become: true
-  tags: test
   when: openhabian_port_http != openhabian_default_port_http or openhabian_port_https != openhabian_default_port_https
   with_items:
-    - { property: 'OPENHAB_HTTP_PORT', value: "{{ openhabian_port_http }}" }
-    - { property: 'OPENHAB_HTTPS_PORT', value: "{{ openhabian_port_https }}" }
+  - { property: 'OPENHAB_HTTP_PORT', value: "{{ openhabian_port_http }}" }
+  - { property: 'OPENHAB_HTTPS_PORT', value: "{{ openhabian_port_https }}" }
   lineinfile:
     dest: "{{ openhab_path_environment }}"
     regexp: "{{ item.property | regex_escape() }}"
@@ -94,11 +91,34 @@
   - Reload systemd daemon
   - Restart openhab
 
+- name: delete old key for openhab karaf console login
+  when: openhabian_refresh_consoleloginkey
+  with_items:
+  - "{{ openhabian_consoleloginkey }}"
+  - "{{ openhabian_consoleloginkey }}.pub"
+  file:
+    path: "{{ item }}"
+    state: absent
+- name: generate key for openhab karaf console login
+  user:
+    name: "{{ ansible_user_id }}"
+    generate_ssh_key: yes
+    ssh_key_type: rsa
+    ssh_key_file: "{{ openhabian_consoleloginkey }}"
+    ssh_key_comment: ""
+  register: userresults
+- name: add public key to console config
+  # see https://community.openhab.org/t/security-of-karaf-console/17661/9
+  lineinfile:
+    dest: "{{ openhab_path_userdata }}/etc/keys.properties"
+    line: "openhab={{ userresults.ssh_public_key[8:] | trim }},_g_:admingroup"
+    insertbefore: '^_g_\\:admingroup = group,admin,manager,viewer,systembundles$'
+    regexp: 'openhab\='
 - name: set permissions for openhab config dirs
   become: true
   with_items:
-    - "{{ openhab_path_conf }}/"
-    - "{{ openhab_path_userdata }}/etc/"
+  - "{{ openhab_path_conf }}/"
+  - "{{ openhab_path_userdata }}/etc/"
   file:
     path: "{{ item }}"
     owner: "{{ openhabian_user }}"
@@ -108,16 +128,16 @@
 
 - name: Configure settings in .cfg files
   with_items:
-    - { file: '{{ openhab_path_conf }}/services/addons.cfg', property: 'package', value: "{{ openhabian_addons_package }}" }
-    - { file: '{{ openhab_path_conf }}/services/addons.cfg', property: 'binding', value: "{{ openhabian_addons_binding | join(',') }}" }
-    - { file: '{{ openhab_path_conf }}/services/addons.cfg', property: 'ui', value: "{{ openhabian_addons_ui | join(',') }}" }
-    - { file: '{{ openhab_path_conf }}/services/addons.cfg', property: 'persistence', value: "{{ openhabian_addons_persistence | join(',') }}" }
-    - { file: '{{ openhab_path_conf }}/services/addons.cfg', property: 'action', value: "{{ openhabian_addons_action | join(',') }}" }
-    - { file: '{{ openhab_path_conf }}/services/runtime.cfg', property: 'org.eclipse.smarthome.core.localeprovider:language', value: 'de' }
-    - { file: '{{ openhab_path_conf }}/services/runtime.cfg', property: 'org.eclipse.smarthome.core.localeprovider:region', value: 'DE' }
-    - { file: '{{ openhab_path_conf }}/services/runtime.cfg', property: 'org.eclipse.smarthome.persistence:default', value: 'mapdb' }
-    - { file: '{{ openhab_path_userdata }}/etc/org.ops4j.pax.logging.cfg', property: 'log4j2.appender.out.policies.size.size', value: '100MB' }
-    - { file: '{{ openhab_path_userdata }}/etc/org.ops4j.pax.logging.cfg', property: 'log4j2.appender.event.policies.size.size', value: '100MB' }
+  - { file: '{{ openhab_path_conf }}/services/addons.cfg', property: 'package', value: "{{ openhabian_addons_package }}" }
+  - { file: '{{ openhab_path_conf }}/services/addons.cfg', property: 'binding', value: "{{ openhabian_addons_binding | join(',') }}" }
+  - { file: '{{ openhab_path_conf }}/services/addons.cfg', property: 'ui', value: "{{ openhabian_addons_ui | join(',') }}" }
+  - { file: '{{ openhab_path_conf }}/services/addons.cfg', property: 'persistence', value: "{{ openhabian_addons_persistence | join(',') }}" }
+  - { file: '{{ openhab_path_conf }}/services/addons.cfg', property: 'action', value: "{{ openhabian_addons_action | join(',') }}" }
+  - { file: '{{ openhab_path_conf }}/services/runtime.cfg', property: 'org.eclipse.smarthome.core.localeprovider:language', value: 'de' }
+  - { file: '{{ openhab_path_conf }}/services/runtime.cfg', property: 'org.eclipse.smarthome.core.localeprovider:region', value: 'DE' }
+  - { file: '{{ openhab_path_conf }}/services/runtime.cfg', property: 'org.eclipse.smarthome.persistence:default', value: 'mapdb' }
+  - { file: '{{ openhab_path_userdata }}/etc/org.ops4j.pax.logging.cfg', property: 'log4j2.appender.out.policies.size.size', value: '100MB' }
+  - { file: '{{ openhab_path_userdata }}/etc/org.ops4j.pax.logging.cfg', property: 'log4j2.appender.event.policies.size.size', value: '100MB' }
   lineinfile:
     dest: "{{ item.file }}"
     regexp: "{{ item.property | regex_escape() }}"

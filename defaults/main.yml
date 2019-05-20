@@ -6,8 +6,8 @@ openhab_stable_address: "https://bintray.com/openhab/mvn/download_file?file_path
 openhab_snapshot_address: "https://openhab.jfrog.io/openhab/libs-snapshot-local/org/openhab/distro/openhab/{{openhab_version}}-SNAPSHOT/openhab-{{openhab_version}}-{{openhab_snapshot_version}}.tar.gz"
 
 openhabian_user: "openhab"
-openhabian_group: "openhab"
-openhabian_admin_group: "{{openhabian_group}}"
+openhabian_group: "{{ openhabian_user }}"
+openhabian_admin_group: "{{ openhabian_group }}"
 openhabian_persistence_user: "openhab"
 openhabian_persistence_password: ""
 openhabian_persistence_db: "OpenHAB"
@@ -31,9 +31,9 @@ openhabian_configfiles:
 - { file: 'weather.cfg', folder: 'services'}
 openhabian_default_port_http: "8080"
 openhabian_default_port_https: "8443"
-openhabian_port_http: "{{openhabian_default_port_http}}"
-openhabian_port_https: "{{openhabian_default_port_https}}"
+openhabian_port_http: "{{ openhabian_default_port_http }}"
+openhabian_port_https: "{{ openhabian_default_port_https }}"
 
 openhabian_install_java: false
-openhabian_consoleloginkey: id_rsa_openhabconsole
+openhabian_consoleloginkey: ~/.ssh/id_rsa_openhabconsole
 openhabian_refresh_consoleloginkey: yes
