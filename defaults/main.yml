@@ -36,4 +36,4 @@ openhabian_port_https: "{{ openhabian_default_port_https }}"
 
 openhabian_install_java: false
 openhabian_consoleloginkey: ~/.ssh/id_rsa_openhabconsole
-openhabian_refresh_consoleloginkey: yes
+openhabian_refresh_consoleloginkey: no
