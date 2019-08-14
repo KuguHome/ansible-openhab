@@ -1,0 +1,53 @@
+- name: Create user
+  when: openhab_installation_mode == "archive"
+  become: True
+  user:
+    name: "{{ openhabian_user }}"
+    system: yes
+    create_home: no
+#    password_lock: yes # will always "change"
+
+- name: create destination
+  when: openhab_installation_mode == "archive"
+  become: True
+  file:
+    state: directory
+    dest: "{{ openhab_path_application }}"
+    owner: "{{ openhabian_user }}"
+    group: "{{ openhabian_group }}"
+
+- name: unpack archive
+  when: openhab_installation_mode == "archive"
+  become: True
+  unarchive:
+    src: "{{ openhab_stable_address }}"
+    dest: "{{ openhab_path_application }}"
+    owner: "{{ openhabian_user }}"
+    group: "{{ openhabian_group }}"
+    remote_src: yes
+    creates: "{{ openhab_path_application }}/runtime"
+    keep_newer: yes
+
+- name: deploy systemd environment
+  when: openhab_installation_mode == "archive" and openhab_path_environment is defined
+  become: true
+  template:
+    src: "environment.j2"
+    dest: "{{ openhab_path_environment }}"
+#    owner: "{{ openhabian_user }}"
+#    group: "{{ openhabian_group }}"
+  notify:
+  - Reload systemd daemon
+  - Restart openhab
+
+- name: setup openhab as a systemd service
+  when: openhab_installation_mode == "archive"
+  become: true
+  template:
+    src: "openhab2.service.j2"
+    dest: "/lib/systemd/system/{{ openhab_service_name }}.service"
+#    owner: "{{ openhabian_user }}"
+#    group: "{{ openhabian_group }}"
+  notify:
+  - Reload systemd daemon
+  - Restart openhab

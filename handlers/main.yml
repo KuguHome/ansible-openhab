@@ -6,5 +6,5 @@
 - name: Restart openhab
   become: true
   systemd:
-    name: openhab2
+    name: "{{ openhab_service_name }}"
     state: restarted

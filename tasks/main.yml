@@ -2,7 +2,10 @@
   tags: always
   include_vars: "{{ openhab_installation_mode }}.yml"
 
-- name: Add Azul key
+- name: Include tasks depending on installation mode
+  include: "install-{{ openhab_installation_mode }}.yml"
+
+- name: Add Azul repo key
   when: openhabian_install_java
   become: True
   apt_key:
@@ -21,60 +24,6 @@
     update_cache: yes
     name:
     - zulu-8
-
-- name: Create user
-  when: openhab_installation_mode == "archive"
-  become: True
-  user:
-    name: "{{ openhabian_user }}"
-    system: yes
-    create_home: no
-#    password_lock: yes # will always "change"
-
-- name: create destination
-  when: openhab_installation_mode == "archive"
-  become: True
-  file:
-    state: directory
-    dest: "{{ openhab_path_application }}"
-    owner: "{{ openhabian_user }}"
-    group: "{{ openhabian_group }}"
-
-- name: unpack archive
-  when: openhab_installation_mode == "archive"
-  become: True
-  unarchive:
-    src: "{{ openhab_stable_address }}"
-    dest: "{{ openhab_path_application }}"
-    owner: "{{ openhabian_user }}"
-    group: "{{ openhabian_group }}"
-    remote_src: yes
-    creates: "{{ openhab_path_application }}/runtime"
-    keep_newer: yes
-
-- name: deploy systemd environment
-  when: openhab_installation_mode == "archive"
-  become: true
-  template:
-    src: "environment.j2"
-    dest: "{{ openhab_path_environment }}"
-#    owner: "{{ openhabian_user }}"
-#    group: "{{ openhabian_group }}"
-  notify:
-  - Reload systemd daemon
-  - Restart openhab
-
-- name: setup openhab as a systemd service
-  when: openhab_installation_mode == "archive"
-  become: true
-  template:
-    src: "openhab2.service.j2"
-    dest: "/lib/systemd/system/openhab2.service"
-#    owner: "{{ openhabian_user }}"
-#    group: "{{ openhabian_group }}"
-  notify:
-  - Reload systemd daemon
-  - Restart openhab
 
 - name: configure http ports
   become: true
@@ -107,6 +56,18 @@
     ssh_key_file: "{{ openhabian_consoleloginkey }}"
     ssh_key_comment: ""
   register: userresults
+- name: set permissions for openhab config dirs
+  become: true
+  with_items:
+  - "{{ openhab_path_conf }}/"
+  - "{{ openhab_path_userdata }}/etc/"
+  - "{{ openhab_path_addons }}"
+  file:
+    path: "{{ item }}"
+    owner: "{{ openhabian_user }}"
+    group: "{{ openhabian_admin_group }}"
+    mode: "u+rw,g+rw,o=rX"
+    recurse: yes
 - name: add public key to console config
   # see https://community.openhab.org/t/security-of-karaf-console/17661/9
   lineinfile:
@@ -114,17 +75,7 @@
     line: "openhab={{ userresults.ssh_public_key[8:] | trim }},_g_:admingroup"
     insertbefore: '^_g_\\:admingroup = group,admin,manager,viewer,systembundles$'
     regexp: 'openhab\='
-- name: set permissions for openhab config dirs
-  become: true
-  with_items:
-  - "{{ openhab_path_conf }}/"
-  - "{{ openhab_path_userdata }}/etc/"
-  file:
-    path: "{{ item }}"
-    owner: "{{ openhabian_user }}"
-    group: "{{ openhabian_admin_group }}"
-    mode: "u+rw,g+rw,o=r"
-    recurse: yes
+
 
 - name: Configure settings in .cfg files
   with_items:
@@ -145,6 +96,18 @@
     regexp: "{{ item.property | regex_escape() }}"
     line: "{{ item.property }} = {{ item.value }}"
     backrefs: yes # to only change if regexp matches
+
+- name: Configure some additional settings in .cfg files
+  when: openhabian_port_ssh is defined and openhabian_port_lsp is defined
+  with_items:
+  - { file: '{{ openhab_path_conf }}/services/runtime.cfg', property: 'org.apache.karaf.shell:sshPort', value: "{{ openhabian_port_ssh }}" }
+  - { file: '{{ openhab_path_conf }}/services/runtime.cfg', property: 'org.eclipse.smarthome.lsp:port', value: "{{ openhabian_port_lsp }}" }
+  lineinfile:
+    dest: "{{ item.file }}"
+    regexp: "{{ item.property | regex_escape() }}"
+    line: "{{ item.property }} = {{ item.value }}"
+#    backrefs: yes # to only change if regexp matches
+
 - name: add log level configuration for certain packages
   tags: logging
   blockinfile:
@@ -158,10 +121,11 @@
     dest: "{{ openhab_path_conf }}/{{ item.folder }}/{{ item.file }}"
     owner: "{{ openhabian_user }}"
     group: "{{ openhabian_admin_group }}"
-    mode: "u+rw,g+rw,o=r"
+    mode: "u+rw,g+rw,o=rX"
   become: yes
 
 - name: deploy additional addons from local machine
+  tags: addons
   when: openhab_additional_addons_local is defined
   with_items: "{{ openhab_additional_addons_local }}"
   copy:
@@ -169,8 +133,18 @@
     dest: "{{ openhab_path_addons }}/"
 
 - name: Deploy additional addons from remote URLs
+  tags: addons
   when: openhab_additional_addons_url is defined
   with_items: "{{ openhab_additional_addons_url }}"
   get_url:
     url: "{{ item }}"
     dest: "{{ openhab_path_addons }}/"
+
+- name: Trigger systemd deamon reload handler
+  meta: flush_handlers
+- name: Enable and start openHAB
+  become: true
+  systemd:
+    name: "{{ openhab_service_name }}"
+    state: started
+    enabled: yes

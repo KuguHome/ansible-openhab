@@ -1,0 +1,23 @@
+- name: Add openHAB repo key
+  become: True
+  apt_key:
+    url: https://bintray.com/user/downloadSubjectPublicKey?username=openhab
+- name: Add openHAB repository
+  become: True
+  apt_repository:
+#    repo: "deb {{ openhab_stable_repo }} stable main"
+    repo: "deb {{ openhab_testing_repo }} stable main"
+    filename: openhab2
+    state: present
+- name: install openHAB
+  become: True
+  apt:
+    update_cache: yes
+    name:
+    - openhab2
+- name: add user '{{ ansible_user_id }}' to openhab group
+  become: True
+  user:
+    name: '{{ ansible_user_id }}'
+    groups: openhab
+    append: yes
