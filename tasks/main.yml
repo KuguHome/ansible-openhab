@@ -3,27 +3,41 @@
   include_vars: "{{ openhab_installation_mode }}.yml"
 
 - name: Include tasks depending on installation mode
+  tags: install
   include: "install-{{ openhab_installation_mode }}.yml"
 
 - name: Add Azul repo key
-  when: openhabian_install_java
+  when: openhabian_install_java | bool
   become: True
   apt_key:
     id: "0xB1998361219BD9C9"
     keyserver: keyserver.ubuntu.com
 - name: Add Azul repository
-  when: openhabian_install_java
+  when: openhabian_install_java | bool
   become: True
   apt_repository:
     repo: deb http://repos.azulsystems.com/ubuntu stable main
     state: present
 - name: install zulu embedded
-  when: openhabian_install_java
+  when: openhabian_install_java | bool
   become: True
   apt:
     update_cache: yes
     name:
-    - zulu-8
+    - zulu-embedded-8
+
+- name: adding '{{ openhabian_user }}' to groups for access to gpios and other hardware
+  tags: groups
+  become: True
+  user:
+    name: '{{ openhabian_user }}'
+    append: yes
+    groups:
+    - tty
+    - dialout
+    - audio
+    - bluetooth
+    - gpio
 
 - name: configure http ports
   become: true

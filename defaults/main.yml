@@ -15,7 +15,8 @@ openhabian_group: "{{ openhabian_user }}"
 openhabian_admin_group: "{{ openhabian_group }}"
 openhabian_persistence_user: "openhab"
 openhabian_persistence_password: ""
-openhabian_persistence_db: "OpenHAB"
+openhabian_persistence_db: "openhab"
+openhabian_persistence_url: http://127.0.0.1:8086
 openhabian_openhab_prowl_apikey: ""
 openhabian_addons_package: "expert"
 openhabian_addons_binding:
