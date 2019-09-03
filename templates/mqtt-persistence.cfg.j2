@@ -2,11 +2,8 @@ broker={{ openhab_persistence_mqtt_brokername }}
 topic={{ openhab_persistence_mqtt_topic }}
 message=%3$s
 
-/*
-see https://www.openhab.org/addons/persistence/mqtt/#mqtt-persistence
-
-1$ 	item name
-2$ 	item alias as defined in the persistence/mqtt.persist file.
-3$ 	item state: a string representation of the item state. ON/OFF, OPEN/CLOSED and UP/DOWN states are transformed to 1/0 values, respectively.
-4$ 	current DateTime in long format.
-*/
+# see https://www.openhab.org/addons/persistence/mqtt/#mqtt-persistence
+# 1$ 	item name
+# 2$ 	item alias as defined in the persistence/mqtt.persist file.
+# 3$ 	item state: a string representation of the item state. ON/OFF, OPEN/CLOSED and UP/DOWN states are transformed to 1/0 values, respectively.
+# 4$ 	current DateTime in long format.
