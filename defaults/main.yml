@@ -17,6 +17,13 @@ openhabian_persistence_user: "openhab"
 openhabian_persistence_password: ""
 openhabian_persistence_db: "openhab"
 openhabian_persistence_url: http://127.0.0.1:8086
+openhab_persistence_mqtt_brokername: ""
+openhab_persistence_mqtt_url: ""
+openhab_persistence_mqtt_user: ""
+openhab_persistence_mqtt_password: ""
+openhab_persistence_mqtt_clientid: ""
+openhab_persistence_mqtt_topic_base: openhab
+openhab_persistence_mqtt_topic: "{{ openhab_persistence_mqtt_topic_base }}/%1$s"
 openhabian_openhab_prowl_apikey: ""
 openhabian_addons_package: "expert"
 openhabian_addons_binding:
@@ -43,5 +50,6 @@ openhabian_port_http: "{{ openhabian_default_port_http }}"
 openhabian_port_https: "{{ openhabian_default_port_https }}"
 
 openhabian_install_java: false
+openhab_java_version: "{{ 'zulu-embedded-8' if ansible_architecture=='armv7l' else 'zulu-8' }}"
 openhabian_consoleloginkey: ~/.ssh/id_rsa_openhabconsole
 openhabian_refresh_consoleloginkey: no

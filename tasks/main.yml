@@ -18,13 +18,13 @@
   apt_repository:
     repo: deb http://repos.azulsystems.com/ubuntu stable main
     state: present
-- name: install zulu embedded
+- name: install java environment
   when: openhabian_install_java | bool
   become: True
   apt:
     update_cache: yes
     name:
-    - zulu-embedded-8
+    - "{{ openhab_java_version }}"
 
 - name: adding '{{ openhabian_user }}' to groups for access to gpios and other hardware
   tags: groups
