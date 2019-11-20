@@ -24,6 +24,7 @@ openhab_persistence_mqtt_password: ""
 openhab_persistence_mqtt_clientid: "openhab-{{ ansible_hostname }}"
 openhab_persistence_mqtt_topic_base: openhab
 openhab_persistence_mqtt_topic: "{{ openhab_persistence_mqtt_topic_base }}/%1$s"
+openhab_persistence_mqtt_message: "%3$s"
 openhabian_openhab_prowl_apikey: ""
 openhabian_addons_package: "expert"
 openhabian_addons_binding:
