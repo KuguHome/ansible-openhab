@@ -52,6 +52,6 @@ openhabian_port_http: "{{ openhabian_default_port_http }}"
 openhabian_port_https: "{{ openhabian_default_port_https }}"
 
 openhabian_install_java: false
-openhab_java_version: "{{ 'zulu-embedded-8' if ansible_architecture=='armv7l' else 'zulu-8' }}"
+openhab_java_version: "{{ 'zulu-embedded-8' if ansible_architecture=='armv7l' or ansible_architecture=='armv6l' else 'zulu-8' }}"
 openhabian_consoleloginkey: ~/.ssh/id_rsa_openhabconsole
 openhabian_refresh_consoleloginkey: no
