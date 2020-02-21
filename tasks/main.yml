@@ -142,17 +142,25 @@
   tags: addons
   when: openhab_additional_addons_local is defined
   with_items: "{{ openhab_additional_addons_local }}"
+  become: true
   copy:
     src: "{{ item }}"
     dest: "{{ openhab_path_addons }}/"
+    owner: "{{ openhabian_user }}"
+    group: "{{ openhabian_admin_group }}"
+    mode: "u+rw,g+rw,o=rX"
 
 - name: Deploy additional addons from remote URLs
   tags: addons
   when: openhab_additional_addons_url is defined
   with_items: "{{ openhab_additional_addons_url }}"
+  become: true
   get_url:
     url: "{{ item }}"
     dest: "{{ openhab_path_addons }}/"
+    owner: "{{ openhabian_user }}"
+    group: "{{ openhabian_admin_group }}"
+    mode: "u+rw,g+rw,o=rX"
 
 - name: Trigger systemd deamon reload handler
   meta: flush_handlers
