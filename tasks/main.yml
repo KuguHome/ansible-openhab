@@ -32,12 +32,7 @@
   user:
     name: '{{ openhabian_user }}'
     append: yes
-    groups:
-    - tty
-    - dialout
-    - audio
-    - bluetooth
-    - gpio
+    groups: "{{ openhab_additional_groups }}"
 
 - name: configure http ports
   become: true
