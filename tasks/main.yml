@@ -165,3 +165,8 @@
     name: "{{ openhab_service_name }}"
     state: started
     enabled: yes
+
+- name: Include InfluxDB installation tasks
+  tags: install
+  when: openhab_install_influxdb
+  include: "influxdb.yml"

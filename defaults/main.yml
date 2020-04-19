@@ -56,3 +56,7 @@ openhabian_install_java: false
 openhab_java_version: "{{ 'zulu-embedded-8' if ansible_architecture=='armv7l' or ansible_architecture=='armv6l' else 'zulu-8' }}"
 openhabian_consoleloginkey: ~/.ssh/id_rsa_openhabconsole
 openhabian_refresh_consoleloginkey: no
+
+openhab_install_influxdb: false
+openhab_influxdb_path_data: /var/lib/influxdb/data
+openhab_influxdb_path_idx: /var/lib/influxdb/wal

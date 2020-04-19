@@ -1,0 +1,52 @@
+- name: Import InfluxDB GPG signing key
+  become: true
+  apt_key:
+    url: https://repos.influxdata.com/influxdb.key
+    state: present
+- name: Add InfluxDB repository
+  become: true
+  apt_repository:
+    repo: deb https://repos.influxdata.com/debian stretch stable
+    state: present
+- name: Install InfluxDB packages
+  become: true
+  apt:
+    name: influxdb
+    state: present
+- name: deploy influxdb configuration - operational parms
+  become: true
+  tags: configuration
+  template:
+    src: "influxdb.conf.j2"
+    dest: "/etc/influxdb/influxdb.conf"
+    group: "{{ openhabian_admin_group }}"
+  notify:
+  - Restart InfluxDB
+- name: deploy influxdb configuration - logfile destination
+  become: true
+  tags: configuration
+  template:
+    src: "influxdb.default.j2"
+    dest: "/etc/default/influxdb"
+    group: "{{ openhabian_admin_group }}"
+  notify:
+  - Restart InfluxDB
+- name: Start the InfluxDB service
+  become: true
+  service:
+    name: influxdb
+    state: started
+    daemon_reload: yes
+    enabled: True
+- name: install pip
+  become: true
+  apt:
+    name: python-pip
+    state: present
+- name: install influxdb python module
+  become: true
+  pip:
+    name: influxdb
+- name: Create database
+  influxdb_database:
+    database_name: "{{ openhabian_persistence_db }}"
