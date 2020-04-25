@@ -13,6 +13,7 @@ openhab_service_name: openhab2
 openhabian_user: "openhab"
 openhabian_group: "{{ openhabian_user }}"
 openhabian_admin_group: "{{ openhabian_group }}"
+openhab_file_permissions: "u+rw,g+rw,o=rX"
 openhab_additional_groups: ['tty','dialout','audio','bluetooth','gpio']
 openhabian_persistence_user: "openhab"
 openhabian_persistence_password: ""

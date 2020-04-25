@@ -75,7 +75,7 @@
     path: "{{ item }}"
     owner: "{{ openhabian_user }}"
     group: "{{ openhabian_admin_group }}"
-    mode: "u+rw,g+rw,o=rX"
+    mode: "{{ openhab_file_permissions }}"
     recurse: yes
 - name: add public key to console config
   # see https://community.openhab.org/t/security-of-karaf-console/17661/9
@@ -130,7 +130,7 @@
     dest: "{{ openhab_path_conf }}/{{ item.folder }}/{{ item.file }}"
     owner: "{{ openhabian_user }}"
     group: "{{ openhabian_admin_group }}"
-    mode: "u+rw,g+rw,o=rX"
+    mode: "{{ openhab_file_permissions }}"
   become: yes
 
 - name: deploy additional addons from local machine
@@ -143,7 +143,7 @@
     dest: "{{ openhab_path_addons }}/"
     owner: "{{ openhabian_user }}"
     group: "{{ openhabian_admin_group }}"
-    mode: "u+rw,g+rw,o=rX"
+    mode: "{{ openhab_file_permissions }}"
 
 - name: Deploy additional addons from remote URLs
   tags: addons
@@ -155,7 +155,7 @@
     dest: "{{ openhab_path_addons }}/"
     owner: "{{ openhabian_user }}"
     group: "{{ openhabian_admin_group }}"
-    mode: "u+rw,g+rw,o=rX"
+    mode: "{{ openhab_file_permissions }}"
 
 - name: Trigger systemd deamon reload handler
   meta: flush_handlers
