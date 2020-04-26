@@ -65,6 +65,15 @@
     ssh_key_file: "{{ openhabian_consoleloginkey }}"
     ssh_key_comment: ""
   register: userresults
+
+- name: Get openHAB console SSH host key
+  command: ssh-keyscan -4 -t rsa -p 8101 localhost
+  changed_when: false
+  register: openhabconsolekey
+- name: Ensure openHAB console SSH host key is in known_hosts
+  known_hosts:
+    name: "{{ openhabconsolekey.stdout.split(' ')[0] }}"
+    key: "{{ openhabconsolekey.stdout }}"
 - name: set permissions for openhab config dirs
   become: true
   with_items:
@@ -156,6 +165,19 @@
     owner: "{{ openhabian_user }}"
     group: "{{ openhabian_admin_group }}"
     mode: "{{ openhab_file_permissions }}"
+
+- name: Get list of installed features
+  command: "{{ openhab_consoleconnect_command }} 'feature:list --no-format --ordered --installed'"
+  register: installedfeatures
+  changed_when: false
+- name: Forge features into nice simple list
+  with_items: "{{ installedfeatures.stdout_lines }}"
+  set_fact:
+    openhab_installed_features: "{{ openhab_installed_features + [(item.split('\t').0 | trim)] }}"
+- name: Install features
+  with_items: "{{ openhab_install_features }}"
+  when: item not in openhab_installed_features
+  command: "{{ openhab_consoleconnect_command }} 'feature:install {{ item }}'"
 
 - name: Trigger systemd deamon reload handler
   meta: flush_handlers

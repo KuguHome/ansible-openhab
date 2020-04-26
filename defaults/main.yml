@@ -61,3 +61,9 @@ openhabian_refresh_consoleloginkey: no
 openhab_install_influxdb: false
 openhab_influxdb_path_data: /var/lib/influxdb/data
 openhab_influxdb_path_idx: /var/lib/influxdb/wal
+
+openhab_consoleconnect_command: ssh openhab@localhost -p 8101 -i ~/.ssh/id_rsa_openhabconsole
+
+openhab_install_features: []
+
+openhab_installed_features: []
