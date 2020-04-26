@@ -189,6 +189,8 @@
     enabled: yes
 
 - name: Include InfluxDB installation tasks
-  tags: install
+  tags:
+  - install
+  - influx
   when: openhab_install_influxdb
   include: "influxdb.yml"

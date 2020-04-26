@@ -50,3 +50,4 @@
 - name: Create database
   influxdb_database:
     database_name: "{{ openhabian_persistence_db }}"
+    udp_port: 4444 # hotfix for https://github.com/ansible-collections/community.general/issues/190
