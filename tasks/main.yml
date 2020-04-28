@@ -66,14 +66,6 @@
     ssh_key_comment: ""
   register: userresults
 
-- name: Get openHAB console SSH host key
-  command: ssh-keyscan -4 -t rsa -p 8101 localhost
-  changed_when: false
-  register: openhabconsolekey
-- name: Ensure openHAB console SSH host key is in known_hosts
-  known_hosts:
-    name: "{{ openhabconsolekey.stdout.split(' ')[0] }}"
-    key: "{{ openhabconsolekey.stdout }}"
 - name: set permissions for openhab config dirs
   become: true
   with_items:
@@ -166,6 +158,27 @@
     group: "{{ openhabian_admin_group }}"
     mode: "{{ openhab_file_permissions }}"
 
+- name: Trigger systemd deamon reload handler
+  meta: flush_handlers
+- name: Enable and start openHAB
+  become: true
+  systemd:
+    name: "{{ openhab_service_name }}"
+    state: started
+    enabled: yes
+
+- name: Get openHAB console SSH host key
+  command: ssh-keyscan -4 -t rsa -p 8101 localhost
+  changed_when: false
+  register: openhabconsolekey
+  until: not openhabconsolekey.stderr.endswith('refused') and openhabconsolekey.stdout != ''
+  retries: 20
+  delay: 10
+- name: Ensure openHAB console SSH host key is in known_hosts
+  known_hosts:
+    name: "{{ openhabconsolekey.stdout.split(' ')[0] }}"
+    key: "{{ openhabconsolekey.stdout }}"
+
 - name: Get list of installed features
   command: "{{ openhab_consoleconnect_command }} 'feature:list --no-format --ordered --installed'"
   register: installedfeatures
@@ -178,15 +191,6 @@
   with_items: "{{ openhab_install_features }}"
   when: item not in openhab_installed_features
   command: "{{ openhab_consoleconnect_command }} 'feature:install {{ item }}'"
-
-- name: Trigger systemd deamon reload handler
-  meta: flush_handlers
-- name: Enable and start openHAB
-  become: true
-  systemd:
-    name: "{{ openhab_service_name }}"
-    state: started
-    enabled: yes
 
 - name: Include InfluxDB installation tasks
   tags:
