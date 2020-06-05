@@ -1,0 +1,70 @@
+- name: Stop openhab
+  become: true
+  systemd:
+    name: "{{ openhab_service_name }}"
+    state: stopped
+
+- name: Create temporary folder
+  file:
+    state: directory
+    path: "{{ openhab_path_addons }}/.tmp"
+
+- name: Move all addons into temporary folder, so they don't get picked up by openHAB
+  shell:
+    cmd: "mv {{ openhab_path_addons }}/* {{ openhab_path_addons }}/.tmp/"
+    removes: "{{ openhab_path_addons }}/README"
+    creates: "{{ openhab_path_addons }}/.tmp/README"
+
+
+- name: Remove cache folders
+  loop:
+  - cache
+  - tmp
+  become: true
+  file:
+    state: absent
+    path: "{{ openhab_path_userdata }}/{{ item }}"
+
+- name: Start openhab
+  become: true
+  systemd:
+    name: "{{ openhab_service_name }}"
+    state: started
+
+- name: Wait until openHAB is fully started (paperUI available at {{ openhabian_port_http }})
+  uri:
+    url: "http://localhost:{{ openhabian_port_http }}/paperui"
+    follow_redirects: none
+    method: GET
+  register: _result
+  until: _result.status == 200
+  retries: 100
+  delay: 10
+
+- name: Get list of installed features
+  tags: continue,consolestate
+  command: "{{ openhab_consoleconnect_command }} 'feature:list --no-format --ordered --installed'"
+  register: installedfeatures
+  changed_when: false
+- name: Forge features into nice simple list
+  tags: continue
+  with_items: "{{ installedfeatures.stdout_lines | default([]) }}"
+  set_fact:
+    openhab_installed_features: "{{ openhab_installed_features + [(item.split('\t').0 | trim)] }}"
+- name: Install features
+  tags: continue
+  with_items: "{{ openhab_install_features }}"
+  when: item not in openhab_installed_features
+  command: "{{ openhab_consoleconnect_command }} 'feature:install {{ item }}'"
+
+- name: Move addons back out of temporary folder
+  tags: continue
+  shell:
+    cmd: "mv {{ openhab_path_addons }}/.tmp/* {{ openhab_path_addons }}/"
+    removes: "{{ openhab_path_addons }}/.tmp/README"
+    creates: "{{ openhab_path_addons }}/README"
+
+# - name: Remove temporary folder
+#   file:
+#     state: absent
+#     path: "{{ openhab_path_addons }}/.tmp"

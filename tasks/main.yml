@@ -158,6 +158,15 @@
     group: "{{ openhabian_admin_group }}"
     mode: "{{ openhab_file_permissions }}"
 
+- name: Remove addons from folder
+  tags: addons
+  when: openhab_remove_addons is defined
+  with_items: "{{ openhab_remove_addons }}"
+  become: true
+  file:
+    state: absent
+    path: "{{ openhab_path_addons }}/{{ item }}"
+
 - name: Trigger systemd deamon reload handler
   meta: flush_handlers
 - name: Enable and start openHAB
@@ -179,12 +188,23 @@
     name: "{{ openhabconsolekey.stdout.split(' ')[0] }}"
     key: "{{ openhabconsolekey.stdout }}"
 
+- name: Get list of bundles
+  tags: consolestate
+  command: "{{ openhab_consoleconnect_command }} 'bundle:list'"
+  register: installedbundles
+  changed_when: false
+- name: Forge bundles into nice simple list
+  with_items: "{{ installedbundles.stdout_lines }}"
+  set_fact:
+    openhab_installed_bundles: "{{ openhab_installed_bundles + [(item.split('\t').0 | trim)] }}"
+
 - name: Get list of installed features
+  tags: consolestate
   command: "{{ openhab_consoleconnect_command }} 'feature:list --no-format --ordered --installed'"
   register: installedfeatures
   changed_when: false
 - name: Forge features into nice simple list
-  with_items: "{{ installedfeatures.stdout_lines }}"
+  with_items: "{{ installedfeatures.stdout_lines | default([]) }}"
   set_fact:
     openhab_installed_features: "{{ openhab_installed_features + [(item.split('\t').0 | trim)] }}"
 - name: Install features
