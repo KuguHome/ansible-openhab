@@ -125,6 +125,7 @@
     insertafter: "log4j2\\.appender\\.osgi\\.filter = \\*"
     block: "{{ openhabian_logging_block }}"
 - name: deploy persistence configuration
+  tags: config
   with_items: "{{ openhabian_configfiles }}"
   template:
     src: "{{ item.srcpath | default('') }}{{ item.file }}.j2"
@@ -194,9 +195,10 @@
   register: installedbundles
   changed_when: false
 - name: Forge bundles into nice simple list
+  tags: consolestate
   with_items: "{{ installedbundles.stdout_lines }}"
   set_fact:
-    openhab_installed_bundles: "{{ openhab_installed_bundles + [(item.split('\t').0 | trim)] }}"
+    openhab_installed_bundles: "{{ openhab_installed_bundles | default([]) + [(item.split('\t').0 | trim)] }}"
 
 - name: Get list of installed features
   tags: consolestate
