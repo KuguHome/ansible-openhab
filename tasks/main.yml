@@ -125,7 +125,9 @@
     insertafter: "log4j2\\.appender\\.osgi\\.filter = \\*"
     block: "{{ openhabian_logging_block }}"
 - name: deploy persistence configuration
-  tags: config
+  tags:
+  - config
+  - credentials
   with_items: "{{ openhabian_configfiles }}"
   template:
     src: "{{ item.srcpath | default('') }}{{ item.file }}.j2"
